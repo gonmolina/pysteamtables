@@ -1,0 +1,48 @@
+package:
+  name: pysteamtables
+  version: {{ environ.get('GIT_DESCRIBE_TAG', 'v0.0.0')[1:] }}
+
+source:
+  git_url: ../
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  string: py{{ environ.get('PY_VER').replace('.', '') }}_{{ environ.get('GIT_DESCRIBE_HASH', '') }}_{{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - cmake
+    - make  # [linux]
+    - gsl
+    - numpy
+    - cython
+
+  host:
+    - gsl
+    - python
+    - numpy
+    - cython
+    - scikit-build >=0.10.0
+    
+
+  run:
+    - python {{ PY_VER }}
+
+test:
+  requires:
+    - pytest
+  imports:
+    - pysteamtables
+  commands:
+    - pytest --pyargs pysteamtables
+
+about:
+  home: localhost
+  dev_url: localhost
+  license: GPL-2.0-only
+  license_family: GPL
+  license_file: ../LICENSE
+  summary: 'PYSTEAMTABLES: Steam tables wrapper of freesteam table.'
+  description: |
+    PYSTEAMTABLES wraps de freesteam C table to be used in Python using Cython.

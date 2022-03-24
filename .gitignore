@@ -1,0 +1,10 @@
+build/
+.vscode/
+_skbuild/
+dist/
+__pycache__/
+.pytest_cache/
+*.so
+*.dll
+*.pyd
+*code-workspace

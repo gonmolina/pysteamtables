@@ -1,0 +1,5 @@
+include pysteamtables/lib/*.c
+include pysteamtables/lib/*.h
+include README.md
+include CMakeLists.txt
+include conda-recipe/*
