@@ -1,0 +1,9 @@
+[run]
+source = pysteamtables
+omit = 
+  */tests/*
+  */version.py
+
+[paths]
+source =
+  pysteamtables/

@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get -y install cmake --fix-missing
           sudo apt-get -y install libgsl-dev 
-          pip install scikit-build pytest
+          pip install cython numpy scikit-build pytest
       - name: Create PySteamTables sdist
         run: python setup.py sdist
 
@@ -41,7 +41,7 @@ jobs:
         run: pytest
 
   build-pip:
-    name: Build pip Py${{ matrix.python }}, ${{ matrix.os }}, ${{ matrix.bla_vendor}}
+    name: Build pip Py${{ matrix.python }}, ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     needs: build-setup
     strategy:
@@ -80,6 +80,8 @@ jobs:
           sudo apt-get -y update
           sudo apt-get -y install cmake --fix-missing
           sudo apt-get -y install libgsl-dev
+          pip install cython numpy scikit-build pytest
+          
       - name: Setup macOS
         if: matrix.os == 'macos'
         run: |
@@ -89,10 +91,11 @@ jobs:
           CMAKE_GENERATOR: Unix Makefiles
         run: |
           python -m pip install --upgrade pip
+          pip install cython numpy scikit-build pytest
           pip wheel -v -w . .
           wheeldir=pysteamtables-wheels/${{ matrix.os }}-${{ matrix.python }}
           mkdir -p ${wheeldir}
-          cp ./pystetamtables*.whl ${wheeldir}/
+          cp ./pysteamtables*.whl ${wheeldir}/
       - name: Save wheel
         uses: actions/upload-artifact@v2
         with:
@@ -108,7 +111,7 @@ jobs:
         matrix:
           os:
             - 'ubuntu'
-            - 'macos'
+            # - 'macos'
             - 'windows'
           python:
             - '3.9'
@@ -131,12 +134,13 @@ jobs:
         shell: bash -l {0}
         run: |
           set -e
-          conda install conda-build conda-verify
-          conda-build --python "${{ matrix.python }}"
-          find "${CONDA_PREFIX}/conda-bld" -maxdepth 2 -name 'pysteamtable*.tar.bz2' | while read -r conda_pkg; do
+          conda install conda-build conda-verify numpy
+          numpyversion=$(python -c 'import numpy; print(numpy.version.version)')
+          conda-build --python "${{ matrix.python }}" --numpy $numpyversion conda-recipe
+          find "${CONDA_PREFIX}/conda-bld" -maxdepth 2 -name 'pysteamtables*.tar.bz2' | while read -r conda_pkg; do
             conda_platform=$(basename $(dirname "${conda_pkg}"))
-            mkdir -p "pysteamtable-conda-pkgs/${conda_platform}"
-            cp "${conda_pkg}" "pysteamtable-conda-pkgs/${conda_platform}/"
+            mkdir -p "pysteamtables-conda-pkgs/${conda_platform}"
+            cp "${conda_pkg}" "pysteamtables-conda-pkgs/${conda_platform}/"
           done
       - name: Save to local conda pkg channel
         uses: actions/upload-artifact@v2
@@ -215,7 +219,7 @@ jobs:
         run: |
           set -xe
           brew install coreutils
-          brew install libgsl-dev
+          brew install gsl
       - name: Download wheels
         uses: actions/download-artifact@v2
         with:
