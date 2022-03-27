@@ -5,18 +5,18 @@ import json, re
 from pathlib import Path
 
 osmap = {'linux': 'ubuntu',
-         'osx': 'macos',
+        # 'osx': 'macos',
          'win': 'windows',
          }
 
 
-combinations = {'ubuntu': [],
-                'macos': [],
-                'windows': [],
+combinations = {'ubuntu': [''],
+                # 'macos': [''],
+                'windows': [''],
                }
 
 conda_jobs = []
-for conda_pkg_file in Path("slycot-conda-pkgs").glob("*/*.tar.bz2"):
+for conda_pkg_file in Path("pysteamtables-conda-pkgs").glob("*/*.tar.bz2"):
     cos = osmap[conda_pkg_file.parent.name.split("-")[0]]
     m = re.search(r'py(\d)(\d+)_', conda_pkg_file.name)
     if m is not None:
