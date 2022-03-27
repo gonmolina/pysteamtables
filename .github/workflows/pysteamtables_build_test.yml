@@ -280,7 +280,6 @@ jobs:
       - name: Install Conda package
         run: |
           set -e
-          esac
           conda index --no-progress ./pysteamtables-conda-pkgs
           conda install -c ./pysteamtables-conda-pkgs pysteamtables
           conda list
