@@ -1,0 +1,7 @@
+include setup.py
+exclude MANIFEST.in
+include pysteamtables/lib/*
+include pysteamtables/CMakeLists.txt
+include pysteamtables/steam_tables.pyx
+include tests/*
+include CMakeLists.txt

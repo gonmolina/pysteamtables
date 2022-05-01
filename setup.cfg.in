@@ -1,0 +1,10 @@
+[metadata]
+
+name = pysteamtables
+version = @version@
+gitrevision = @gitrevision@
+release = @release@
+
+[tool:pytest]
+# run the tests with compiled and installed package
+addopts = --pyargs pysteamtables

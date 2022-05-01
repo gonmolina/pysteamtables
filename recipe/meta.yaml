@@ -1,0 +1,46 @@
+{% set name = "pysteamtables" %}
+{% set version = "0.0.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: ../
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  string: py{{ environ.get('PY_VER').replace('.', '') }}_{{ environ.get('GIT_DESCRIBE_HASH', '') }}_{{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+
+requirements:
+  build: 
+    - {{ compiler('c') }}
+    - cmake
+    - make  # [linux]
+    - gsl
+    - scikit-build
+    - cython 
+
+  host:
+    - pip
+    - python >=3.7
+
+  run:
+    - python >=3.7
+
+test:
+  imports:
+    - pysteamtables
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  summary: 'PySteamTables: A python wrapper for Freesteam steam tables'
+  license: GPL-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - gonzalomolina1990
