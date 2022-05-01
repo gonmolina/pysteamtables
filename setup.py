@@ -12,11 +12,11 @@ from skbuild.command.sdist import sdist
 try:
     import configparser
 except ImportError:
-    import ConfigParser as configparser
+    import ConfigParser as configparser # pyright: reportMissingImports=false
 
 
-
-DOCLINES = __doc__.split("\n")
+if __doc__:
+    DOCLINES = __doc__.split("\n")
 
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -36,15 +36,13 @@ Operating System :: Unix
 Operating System :: MacOS
 """
 
-# defaults
-ISRELEASED = True
 # assume a version set by conda, next update with git,
 # otherwise count on default
 VERSION = 'Unknown'
 
 
 class GitError(RuntimeError):
-    """Exception for git errors occuring in in git_version"""
+    """Exception for git errors occurring in in git_version"""
     pass
 
 
@@ -76,11 +74,10 @@ def git_version(srcdir=None):
             raise GitError("git err; return code %d, error message:\n  '%s'"
                            % (proc.returncode, errmsg))
         return out
-
+    GIT_VERSION = VERSION
+    GIT_REVISION = 'Unknown'
+    GIT_CYCLE = 0
     try:
-        GIT_VERSION = VERSION
-        GIT_REVISION = 'Unknown'
-        GIT_CYCLE = 0
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'], srcdir)
         GIT_REVISION = out.strip().decode('ascii')
         out = _minimal_ext_cmd(['git', 'tag'], srcdir)
@@ -114,8 +111,7 @@ def rewrite_setup_cfg(version, gitrevision, release):
     cfg.close()
 
 
-def get_version_info(srcdir=None):
-    global ISRELEASED
+def get_version_info(srcdir=None, IS_RELEASED=True):
     GIT_CYCLE = 0
 
     # Adding the git rev number needs to be done inside write_version_py(),
@@ -123,13 +119,13 @@ def get_version_info(srcdir=None):
     if os.environ.get('CONDA_BUILD', False):
         FULLVERSION = os.environ.get('PKG_VERSION', '???')
         GIT_REVISION = os.environ.get('GIT_DESCRIBE_HASH', '')
-        ISRELEASED = True
+        IS_RELEASED = True
         rewrite_setup_cfg(FULLVERSION, GIT_REVISION, 'yes')
     elif os.path.exists('.git'):
         FULLVERSION, GIT_REVISION, GIT_CYCLE = git_version(srcdir)
-        ISRELEASED = (GIT_CYCLE == 0)
+        IS_RELEASED = (GIT_CYCLE == 0)
         rewrite_setup_cfg(FULLVERSION, GIT_REVISION,
-                          (ISRELEASED and 'yes') or 'no')
+                          (IS_RELEASED and 'yes') or 'no')
     elif os.path.exists('setup.cfg'):
         # valid distribution
         setupcfg = configparser.ConfigParser(allow_no_value=True)
@@ -160,7 +156,7 @@ def get_version_info(srcdir=None):
             FULLVERSION = VERSION
             GIT_REVISION = "Unknown"
 
-    if not ISRELEASED:
+    if not IS_RELEASED:
         FULLVERSION += '.' + str(GIT_CYCLE)
 
     return FULLVERSION, GIT_REVISION
@@ -171,7 +167,7 @@ class sdist_checked(sdist):
     def run(self):
         sdist.run(self)
 
-def setup_package():
+def setup_package(IS_RELEASED=True):
     src_path = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, src_path)
 
@@ -195,7 +191,7 @@ def setup_package():
         cmdclass={"sdist": sdist_checked},
         cmake_args=['-DPYSTEAMTABLES_VERSION:STRING=' + VERSION,
                     '-DGIT_REVISION:STRING=' + gitrevision,
-                    '-DISRELEASE:STRING=' + str(ISRELEASED),
+                    '-DISRELEASE:STRING=' + str(IS_RELEASED),
                     '-DFULL_VERSION=' + VERSION + '.git' + gitrevision[:7]],
         zip_safe=False,
         install_requires=['numpy'],

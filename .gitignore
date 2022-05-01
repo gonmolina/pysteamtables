@@ -1,0 +1,12 @@
+build/
+.vscode/
+_skbuild/
+dist/
+__pycache__/
+pysteamtables.egg-info/
+.pytest_cache/
+*.so
+*.dll
+*.pyd
+*code-workspace
+setup.cfg
