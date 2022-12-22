@@ -85,7 +85,7 @@ def git_version(srcdir=None):
         out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'], srcdir)
         GIT_REVISION = out.strip().decode('ascii')
         out = _minimal_ext_cmd(['git', 'tag'], srcdir)
-        GIT_VERSION = out.strip().decode('ascii').split('\n')[-1][1:]
+        GIT_VERSION = out.strip().decode('ascii').split('\n')[-1][0:]
         out = _minimal_ext_cmd(['git', 'describe', '--tags',
                                 '--long', '--always'], srcdir)
         try:
@@ -128,7 +128,7 @@ def get_version_info(srcdir=None):
         rewrite_setup_cfg(FULLVERSION, GIT_REVISION, 'yes')
     elif os.path.exists('.git'):
         FULLVERSION, GIT_REVISION, GIT_CYCLE = git_version(srcdir)
-        ISRELEASED = (GIT_CYCLE == 0)
+        ISRELEASED = (GIT_CYCLE == 0 or GIT_CYCLE == '0')
         rewrite_setup_cfg(FULLVERSION, GIT_REVISION,
                           (ISRELEASED and 'yes') or 'no')
     elif os.path.exists('setup.cfg'):
