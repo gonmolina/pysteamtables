@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.11
       - name: Setup Ubuntu
         run: |
           sudo apt-get -y install cmake --fix-missing
@@ -51,20 +51,17 @@ jobs:
               - 'ubuntu'
               - 'macos'
             python:
-              - '3.7'
-              - '3.9'
               - '3.10'
+              - '3.11'
             include:
               - os: 'ubuntu'
-                python: '3.9'
+                python: '3.10'
               - os: 'ubuntu'
-                python: '3.9'
+                python: '3.11'
               - os: 'macos'
-                python: '3.9'
+                python: '3.10'
               - os: 'macos'
-                python: '3.9'
-              - os: 'macos'
-                python: '3.9'
+                python: '3.11'
 
     steps:
       - name: Checkout PySteamTables
@@ -114,8 +111,8 @@ jobs:
             # - 'macos'
             - 'windows'
           python:
-            - '3.9'
             - '3.10'
+            - '3.11'
 
     steps:
       - name: Checkout PySteamTables

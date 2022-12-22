@@ -150,6 +150,11 @@ cpdef Steam set_uv(double u, double v):
     st.state = freesteam_set_uv(u, v)
     return st
 
+cpdef Steam set_pT(double p, double T):
+    cdef Steam st
+    st=Steam()
+    st.state = freesteam_set_pT(p, T)
+    return st
 
 
 
