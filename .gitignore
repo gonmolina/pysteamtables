@@ -8,6 +8,8 @@ __pycache__/
 *.dll
 *.pyd
 *code-workspace
-.venv/
+.venv*
 wheelhouse/
 *.egg-info/
+pysteamtables/*.so
+pysteamtables/*.c

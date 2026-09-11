@@ -4,4 +4,3 @@ include pysteamtables/CMakeLists.txt
 include pysteamtables/steam_tables.pyx
 include README.md
 include CMakeLists.txt
-include conda-recipe/*

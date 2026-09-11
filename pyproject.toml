@@ -7,3 +7,16 @@ requires = [
     "cython>=3.0.0"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+build = ["cp312-*", "cp313-*", "cp314-*"]
+enable = ["cpython-prerelease"]
+test-requires = ["pytest"]
+test-command = "pytest --pyargs pysteamtables"
+
+[tool.cibuildwheel.linux]
+before-all = "git config --global --add safe.directory '*' && (yum install -y gsl-devel || apk add gsl-dev || (apt-get update && apt-get install -y libgsl-dev))"
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path C:/vcpkg/installed/x64-windows/bin"
