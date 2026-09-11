@@ -16,6 +16,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
+
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory "*"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -48,6 +52,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
+
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory "*"
 
       - name: Install GSL on Windows (vcpkg)
         if: runner.os == 'Windows'
@@ -65,8 +73,8 @@ jobs:
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
           CIBW_PRERELEASE_PYTHONS: "True"
           
-          # Linux: install GSL in manylinux container
-          CIBW_BEFORE_ALL_LINUX: "yum install -y gsl-devel || apk add gsl-dev || (apt-get update && apt-get install -y libgsl-dev)"
+          # Linux: install GSL in manylinux container and configure git safe directory
+          CIBW_BEFORE_ALL_LINUX: "git config --global --add safe.directory '*' && (yum install -y gsl-devel || apk add gsl-dev || (apt-get update && apt-get install -y libgsl-dev))"
           
           # Windows: install delvewheel and bundle gsl DLLs into the wheel
           CIBW_BEFORE_BUILD_WINDOWS: "uv pip install delvewheel"
