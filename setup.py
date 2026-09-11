@@ -24,11 +24,14 @@ Intended Audience :: Science/Research
 Intended Audience :: Developers
 License :: OSI Approved :: GNU General Public License v2 (GPLv2)
 Programming Language :: C
-Programming Language :: Python
-Programming Language :: Python :: 3.7
+Programming Language :: Python :: 3
 Programming Language :: Python :: 3.8
 Programming Language :: Python :: 3.9
 Programming Language :: Python :: 3.10
+Programming Language :: Python :: 3.11
+Programming Language :: Python :: 3.12
+Programming Language :: Python :: 3.13
+Programming Language :: Python :: 3.14
 Topic :: Software Development
 Topic :: Scientific/Engineering
 Operating System :: Microsoft :: Windows
@@ -162,7 +165,7 @@ def get_version_info(srcdir=None):
             GIT_REVISION = "Unknown"
 
     if not ISRELEASED:
-        FULLVERSION += '.' + str(GIT_CYCLE)
+        FULLVERSION += '.dev' + str(GIT_CYCLE)
 
     return FULLVERSION, GIT_REVISION
 
@@ -199,8 +202,8 @@ def setup_package():
                     '-DISRELEASE:STRING=' + str(ISRELEASED),
                     '-DFULL_VERSION=' + VERSION + '.git' + gitrevision[:7]],
         zip_safe=False,
-        install_requires=['numpy'],
-        python_requires=">=3.7"
+        install_requires=[],
+        python_requires=">=3.8"
     )
 
     try:

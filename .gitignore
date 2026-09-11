@@ -8,3 +8,6 @@ __pycache__/
 *.dll
 *.pyd
 *code-workspace
+.venv/
+wheelhouse/
+*.egg-info/

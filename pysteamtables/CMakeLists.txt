@@ -1,6 +1,6 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_library(freesteam 
+add_library(freesteam STATIC
 "lib/b23.c"
 "lib/backwards.c"
 "lib/bounds.c"
@@ -27,19 +27,19 @@ add_library(freesteam
 
 
 target_include_directories(freesteam PRIVATE ${GSL_INCLUDE_DIRS})
-target_link_libraries(freesteam -lm ${GSL_LIBRARIES})
-
-add_executable(test "lib/test.c")
-target_link_libraries(test freesteam)
+if(UNIX)
+  target_link_libraries(freesteam m ${GSL_LIBRARIES})
+else()
+  target_link_libraries(freesteam ${GSL_LIBRARIES})
+endif()
 
 add_cython_target(steam_tables OUTPUT_VAR X)
 add_library(steam_tables MODULE ${X})
-target_link_libraries(steam_tables freesteam)
+target_link_libraries(steam_tables freesteam ${GSL_LIBRARIES})
 
 python_extension_module(steam_tables)
 
-install(TARGETS freesteam LIBRARY DESTINATION pysteamtables)
-install(TARGETS steam_tables LIBRARY DESTINATION pysteamtables)
+install(TARGETS steam_tables DESTINATION pysteamtables)
 
 
 

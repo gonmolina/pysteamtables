@@ -1,0 +1,85 @@
+name: Build & Test Wheels
+
+on:
+  push:
+    branches: [ master, main ]
+    tags: [ "v*" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build sdist
+        run: uvx --from build pyproject-build --sdist --outdir dist/
+
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pysteamtables-sdist
+          path: dist/*.tar.gz
+
+  build_wheels:
+    name: Wheels on ${{ matrix.os }} (${{ matrix.cibw_archs }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64
+          - os: ubuntu-latest
+            cibw_archs: "x86_64"
+          # Windows x86_64
+          - os: windows-latest
+            cibw_archs: "AMD64"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GSL on Windows (vcpkg)
+        if: runner.os == 'Windows'
+        run: |
+          vcpkg install gsl:x64-windows
+          "CMAKE_PREFIX_PATH=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "GSL_ROOT_DIR=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build wheels with cibuildwheel
+        env:
+          CIBW_BUILD: "cp312-* cp313-* cp314-*"
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+          CIBW_PRERELEASE_PYTHONS: "True"
+          
+          # Linux: install GSL in manylinux container
+          CIBW_BEFORE_ALL_LINUX: "yum install -y gsl-devel || apk add gsl-dev || (apt-get update && apt-get install -y libgsl-dev)"
+          
+          # Windows: install delvewheel and bundle gsl DLLs into the wheel
+          CIBW_BEFORE_BUILD_WINDOWS: "uv pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel} --add-path C:/vcpkg/installed/x64-windows/bin"
+          
+          # Test configuration
+          CIBW_TEST_REQUIRES: "pytest"
+          CIBW_TEST_COMMAND: "pytest --pyargs pysteamtables"
+        run: |
+          uvx cibuildwheel --output-dir wheelhouse
+
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pysteamtables-wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl

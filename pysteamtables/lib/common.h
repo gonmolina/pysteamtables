@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	New versions of GCC are able to make use of these declarations
 	as well.
 */
-#ifdef __WIN32__
+#if defined(_WIN32) || defined(__WIN32__)
 # define FREESTEAM_EXPORT __declspec(dllexport)
 # define FREESTEAM_IMPORT __declspec(dllimport)
 #else
